@@ -1,6 +1,6 @@
 const express = require("express"); // import the express module
-const bodyParser = require("body-parser"); // import the body-parser module
 const path = require("path"); // import the path module
+const bodyParser = require("body-parser"); // import the body-parser module
 //const expressHbs = require("express-handlebars"); // import the express-handlebars module
 
 const adminRoutes = require("./routes/admin"); // import the admin routes (it'll be used for all the requests that start with /admin)
@@ -23,7 +23,7 @@ const app = express(); // create an express app object from the express module (
 //app.set("view engine", "hbs"); // set the view engine to handlebars
 //app.set('view engine', 'pug'); // set the view engine to pug
 app.set("view engine", "ejs"); // set the view engine to ejs
-app.set("views", "views"); // set the views directory to views
+app.set("views", "views"); // set the views directory to views (it's the default directory)
 
 app.use(bodyParser.urlencoded({ extended: false })); // use the body-parser module to parse the request body (it'll be used for all the requests)
 app.use(express.static(path.join(__dirname, "public"))); // use the public directory to serve static files (css, js, images, etc.)

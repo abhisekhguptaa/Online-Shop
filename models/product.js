@@ -1,11 +1,13 @@
-const fs = require("fs"); // import the fs module(file system module to read and write files)
-const path = require("path"); // import the path module (path module to work with file and directory paths)
+const db = require("../util/database"); // import the database module (it'll be used to connect to the database)
+//const fs = require("fs"); // import the fs module(file system module to read and write files)
+//const path = require("path"); // import the path module (path module to work with file and directory paths)
 
-const rootDir = require("../util/path"); // import the path module (path module to work with file and directory paths)
+//const rootDir = require("../util/path"); // import the path module (path module to work with file and directory paths)
 const Cart = require("./cart"); // import the cart module
 
-const p = path.join(rootDir, "data", "products.json"); // get the path to the products.json file
+//const p = path.join(rootDir, "data", "products.json"); // get the path to the products.json file
 
+/*
 const getProductsFromFile = (cb) => {
   // create a function to get the products from the products.json file
   fs.readFile(p, (err, fileContent) => {
@@ -19,6 +21,7 @@ const getProductsFromFile = (cb) => {
     }
   });
 };
+*/
 
 module.exports = class Product {
   // export the Product class
@@ -34,6 +37,7 @@ module.exports = class Product {
   save() {
     // create a save method to save the product to the products.json file (add the product to the products array)
     //const p = path.join(rootDir, "data", "products.json"); // get the path to the products.json file (data\products.json)
+    /*
     getProductsFromFile((products) => {
       // get the products array from the products.json file (data\products.json)
       if (this.id) {
@@ -59,10 +63,16 @@ module.exports = class Product {
         });
       }
     });
+    */
+    return db.execute(
+      "INSERT INTO products (title, price, description, imageUrl) VALUES (?, ?, ?, ?)",
+      [this.title, this.price, this.description, this.imageUrl]
+    ); // insert the product to the database
   }
 
   static deleteById(id) {
     // create a static deleteById method to delete a product from the products.json file (delete the product from the products array) by id
+    /*
     getProductsFromFile((products) => {
       const product = products.find((prod) => prod.id === id);
       // get the products array from the products.json file (data\products.json)
@@ -75,20 +85,25 @@ module.exports = class Product {
         }
       });
     });
+    */
   }
 
-  static fetchAll(cb) {
+  static fetchAll() {
     // create a static fetchAll method to get the products array from the products.json file (data\products.json)
     //const p = path.join(rootDir, "data", "products.json");  // get the path to the products.json file (data\products.json)
-    getProductsFromFile(cb); // get the products array from the products.json file (data\products.json) and return it to the callback function (cb)
+    //getProductsFromFile(cb); // get the products array from the products.json file (data\products.json) and return it to the callback function (cb)
+    return db.execute("SELECT * FROM products"); // return all the products from the database
   }
 
-  static findById(id, cb) {
+  static findById(id) {
     // create a static findById method to get a product from the products array by id
+    /*
     getProductsFromFile((products) => {
       // get the products array from the products.json file (data\products.json)
       const product = products.find((p) => p.id === id); // find the product in the products array by id
       cb(product); // return the product to the callback function (cb)
     });
+    */
+    return db.execute("SELECT * FROM products WHERE products.id = ?", [id]); // return the product from the database by id
   }
 };

@@ -7,51 +7,66 @@ exports.getProducts = (req, res, next) => {
   //res.sendFile(path.join(rootDir,'views','shop.html')); // send the shop page (html file)
   //const products = adminData.products; // get the products array from the admin routes
   //res.render('shop',{prods:products,pageTitle:'Shop',path:'/'}); // render the shop page (pug template)
-  Product.fetchAll((products) => {
-    // fetch all the products from the products array
-    res.render("shop/product-list", {
-      // render the shop page (ejs template) (views\shop\product-list.ejs)
-      prods: products, // pass the products array to the shop page (views\shop\product-list.ejs)
-      pageTitle: "All Products", // pass the page title to the shop page (views\shop\product-list.ejs)
-      path: "/products", // pass the path to the shop page (views\shop\product-list.ejs)
-      /*hasProducts: products.length > 0, // pass the hasProducts variable to the shop page
-      activeShop: true, // pass the activeShop variable to the shop page
-      productCSS: true, // pass the productCSS variable to the shop page*/
+  Product.fetchAll()
+    .then(([rows, fieldData]) => {
+      res.render("shop/product-list", {
+        // render the shop page (ejs template) (views\shop\product-list.ejs)
+        prods: rows, // pass the products array to the shop page (views\shop\product-list.ejs)
+        pageTitle: "All Products", // pass the page title to the shop page (views\shop\product-list.ejs)
+        path: "/products", // pass the path to the shop page (views\shop\product-list.ejs)
+        /*hasProducts: products.length > 0, // pass the hasProducts variable to the shop page
+          activeShop: true, // pass the activeShop variable to the shop page
+          productCSS: true, // pass the productCSS variable to the shop page*/
+      });
+    })
+    .catch((err) => {
+      console.log(err);
     });
-  });
+  // fetch all the products from the products array
 };
 
 exports.getProduct = (req, res, next) => {
   // create a function to get the product detail page (GET request) (views\shop\product-detail.ejs)
   const prodId = req.params.productId; // get the product id from the url (params)
   //console.log(prodId); // print the product id to the console
-  Product.findById(prodId, (product) => {
-    // find the product by id
-    //console.log(product); // print the product to the console
-    res.render("shop/product-detail", {
-      // render the product detail page (views\shop\product-detail.ejs)
-      product: product, // pass the product to the product detail page (views\shop\product-detail.ejs)
-      pageTitle: product.title, // pass the page title to the product detail page (views\shop\product-detail.ejs)
-      path: "/products", // pass the path to the product detail page (views\shop\product-detail.ejs)
-    }); // render the product detail page (views\shop\product-detail.ejs)
-  });
+  Product.findById(prodId)
+    .then(([rows, fieldData]) => {
+      console.log(rows);
+      res.render("shop/product-detail", {
+        // render the product detail page (views\shop\product-detail.ejs)
+        product: rows[0], // pass the product to the product detail page (views\shop\product-detail.ejs)
+        pageTitle: rows.title, // pass the page title to the product detail page (views\shop\product-detail.ejs)
+        path: "/products", // pass the path to the product detail page (views\shop\product-detail.ejs)
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  // find the product by id
+  //console.log(product); // print the product to the console
+  // render the product detail page (views\shop\product-detail.ejs)
+
   //res.redirect("/"); // redirect to the home page
 };
 
 exports.getIndex = (req, res, next) => {
   // create a function to get the index page (GET request) (views\shop\index.ejs)
-  Product.fetchAll((products) => {
-    // fetch all the products from the products array (views\shop\index.ejs)
-    res.render("shop/index", {
-      // render the shop page (views\shop\index.ejs)
-      prods: products, // pass the products array to the shop page (views\shop\index.ejs)
-      pageTitle: "Shop", // pass the page title to the shop page (views\shop\index.ejs)
-      path: "/", // pass the path to the shop page (views\shop\index.ejs)
-      /*hasProducts: products.length > 0, // pass the hasProducts variable to the shop page
-      activeShop: true, // pass the activeShop variable to the shop page
-      productCSS: true, // pass the productCSS variable to the shop page*/
+  Product.fetchAll()
+    .then(([rows, fieldData]) => {
+      res.render("shop/index", {
+        // render the shop page (views\shop\index.ejs)
+        prods: rows, // pass the products array to the shop page (views\shop\index.ejs)
+        pageTitle: "Shop", // pass the page title to the shop page (views\shop\index.ejs)
+        path: "/", // pass the path to the shop page (views\shop\index.ejs)
+        /*hasProducts: products.length > 0, // pass the hasProducts variable to the shop page
+          activeShop: true, // pass the activeShop variable to the shop page
+          productCSS: true, // pass the productCSS variable to the shop page*/
+      });
+    })
+    .catch((err) => {
+      console.log(err);
     });
-  });
+  // fetch all the products from the products array (views\shop\index.ejs)
 };
 
 exports.getCart = (req, res, next) => {

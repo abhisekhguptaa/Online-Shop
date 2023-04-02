@@ -21,8 +21,15 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price; // get the price from the request body
   const description = req.body.description; // get the description from the request body
   const product = new Product(null, title, imageUrl, price, description); // create a new product object from the product model (class) and pass the title, image url, price and description to the constructor
-  product.save(); // save the product to the products array (../models/product.js)
-  res.redirect("/"); // redirect to the home page (shop page)
+  product
+    .save()
+    .then(() => {
+      res.redirect("/");
+    })
+    .catch((err) => {
+      console.log(err);
+    }); // save the product to the products array (../models/product.js)
+  // redirect to the home page (shop page)
 };
 
 exports.getEditProduct = (req, res, next) => {

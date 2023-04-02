@@ -6,6 +6,7 @@ const bodyParser = require("body-parser"); // import the body-parser module
 const adminRoutes = require("./routes/admin"); // import the admin routes (it'll be used for all the requests that start with /admin)
 const shopRoutes = require("./routes/shop"); // import the shop routes (it'll be used for all the requests)
 const errorController = require("./controllers/error"); // import the error controller (it'll be used for all the requests)
+//const db = require("./util/database"); // import the database module (it'll be used to connect to the database)
 
 const app = express(); // create an express app object from the express module (it'll be used to handle the requests)
 
@@ -30,6 +31,16 @@ app.use(express.static(path.join(__dirname, "public"))); // use the public direc
 
 app.use("/admin", adminRoutes); // use the admin routes with /admin prefix (it'll be used for all the requests that start with /admin)
 app.use(shopRoutes); // use the shop routes (it'll be used for all the requests)
+
+/*
+db.execute("SELECT * FROM products")
+  .then((result) => {
+    console.log(result[0], result[1]);
+  })
+  .catch((err) => {
+    console.log(err);
+  }); // execute a query to test the connection to the database
+*/
 
 app.use(errorController.get404); // use the error controller to handle 404 errors (it'll be used for all the requests)
 

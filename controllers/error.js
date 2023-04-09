@@ -4,5 +4,6 @@ exports.get404 = (req, res, next) => {
     // set the status code to 404 and render the 404 page (views\404.ejs)
     pageTitle: "Page not found", // pass the page title to the 404 page
     path: "/404", // pass the path to the 404 page
+    isAuthenticated: req.session.isLoggedIn,
   });
 };

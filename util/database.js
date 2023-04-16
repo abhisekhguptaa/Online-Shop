@@ -16,10 +16,9 @@
 // module.exports = sequelize;
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
+const dotenv = require("dotenv").config();
 // const { log } = require("console");
-const uri =
-  "mongodb+srv://Abhisekh:fzFptUcrpH6oWMaB@first.cjwqqgj.mongodb.net/?retryWrites=true&w=majority";
-const client = new MongoClient(uri, {
+const client = new MongoClient(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
@@ -34,7 +33,6 @@ const mongoConnect = (callback) => {
       console.log("Connected");
       _db = client.db();
       callback();
-      
     })
     .catch((err) => {
       console.log(err);
@@ -42,18 +40,17 @@ const mongoConnect = (callback) => {
     });
 };
 
-const getDb=()=>{
-  if(_db){
+const getDb = () => {
+  if (_db) {
     return _db;
   }
-  throw 'No database found';
+  throw "No database found";
 };
 
 //module.exports = mongoConnect;
 exports.mongoConnect = mongoConnect;
 exports.getDb = getDb;
 // const { MongoClient, ServerApiVersion } = require('mongodb');
-// const uri = "mongodb+srv://Abhisekh:<password>@first.cjwqqgj.mongodb.net/?retryWrites=true&w=majority";
 // const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 // client.connect(err => {
 //   const collection = client.db("test").collection("devices");

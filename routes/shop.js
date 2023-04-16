@@ -25,10 +25,15 @@ router.post("/cart", isAuth, shopController.postCart); // post the cart page (vi
 // it'll be fired when the user visits /cart-delete-item (POST request)
 router.post("/cart-delete-item", isAuth, shopController.postCartDeleteProduct); // post the cart page (views\shop\cart.ejs)
 
-// it'll be fired when the user visits /create-order (POST request)
-router.post("/create-order", isAuth, shopController.postOrder); // get the orders page (views\shop\orders.ejs)
+router.get("/checkout", isAuth, shopController.getCheckout); // get the checkout page (views\shop\checkout.ejs)
+
+router.get("/checkout/success", shopController.getCheckoutSuccess); // get the checkout success page (views\shop\checkout-success.ejs)
+
+router.get("/checkout/cancel", shopController.getCheckout); // get the checkout page (views\shop\checkout.ejs
 
 // it'll be fired when the user visits /create-order (POST request)
 router.get("/orders", isAuth, shopController.getOrders); // get the orders page (views\shop\orders.ejs)
+
+router.get("/orders/:orderId", isAuth, shopController.getInvoice);
 
 module.exports = router; // export the router object

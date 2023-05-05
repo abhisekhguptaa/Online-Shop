@@ -21,7 +21,7 @@
                 <button id="order-btn" class="btn">ORDER</button>
                 <script src="https://js.stripe.com/v3/"></script>
                 <script>
-                    var stripe=Stripe('pk_test_51MxW1WSEJKyZ236oINrtiDsehgYKrMWpCXu4VNfIAEyKyoKrj0W0ty7qOCLArtfITgOVBaJP0BeiLrISXNAWNxr9003dyJCgpF');
+                    var stripe=Stripe('pk_live_51MxW1WSEJKyZ236o8IOALr0mTMXAOKJ6PJmTb6iPtvRfhhSOnONmbX7OthzvZp5wYmNYBqIJJoKGvvW2V0GYsoGO00duTdDPzp');
                     var orderBtn=document.getElementById('order-btn');
                     orderBtn.addEventListener('click',function(){
                         stripe.redirectToCheckout({

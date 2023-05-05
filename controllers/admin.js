@@ -177,7 +177,11 @@ exports.deleteProduct = (req, res, next) => {
         return next(new Error("Product not found"));
       }
       fileHelper.deleteFile(product.imageUrl);
-      return Product.deleteOne({ _id: prodId, userId: req.user._id });
+      return Product.deleteOne({ _id: prodId, userId: req.user._id }).then(
+        (result) => {
+          req.user.removeFromCart(prodId);
+        }
+      );
     })
     .then((result) => {
       console.log("Product destroyed successfully");

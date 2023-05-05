@@ -1,133 +1,113 @@
-const Product = require("../models/product"); // import the product model (class) from the product file in the models directory (../models/product.js)
-//const Cart = require("../models/cart"); // import the cart model (class) from the cart file in the models directory (../models/cart.js)
-const Order = require("../models/order"); // import the order model (class) from the order file in the models directory (../models/order.js)
+const fs = require("fs");
+const path = require("path");
+const PDFDocument = require("pdfkit");
+const dotenv = require("dotenv").config();
+const stripe = require("stripe")(process.env.STRIPE_KEY);
+
+const Product = require("../models/product");
+const Order = require("../models/order");
+
+const ITEMS_PER_PAGE = 2;
 
 exports.getProducts = (req, res, next) => {
-  // create a function to get the products page (GET request)
-  //console.log('shop.js',adminData.products); // print the products array to the console
-  //res.sendFile(path.join(rootDir,'views','shop.html')); // send the shop page (html file)
-  //const products = adminData.products; // get the products array from the admin routes
-  //res.render('shop',{prods:products,pageTitle:'Shop',path:'/'}); // render the shop page (pug template)
+  const page = +req.query.page || 1;
+  let totalItems;
   Product.find()
+    .countDocuments()
+    .then((numProducts) => {
+      totalItems = numProducts;
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
     .then((products) => {
-      console.log(products);
       res.render("shop/product-list", {
-        // render the shop page (ejs template) (views\shop\product-list.ejs)
-        prods: products, // pass the products array to the shop page (views\shop\product-list.ejs)
-        pageTitle: "All Products", // pass the page title to the shop page (views\shop\product-list.ejs)
-        path: "/products", // pass the path to the shop page (views\shop\product-list.ejs)
-        isAuthenticated: req.session.isLoggedIn,
-        /*hasProducts: products.length > 0, // pass the hasProducts variable to the shop page
-          activeShop: true, // pass the activeShop variable to the shop page
-          productCSS: true, // pass the productCSS variable to the shop page*/
+        prods: products,
+        pageTitle: "Products",
+        path: "/products",
+        currentPage: page,
+        hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+        hasPreviousPage: page > 1,
+        nextPage: page + 1,
+        previousPage: page - 1,
+        lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
-  // fetch all the products from the products array
 };
 
 exports.getProduct = (req, res, next) => {
-  // create a function to get the product detail page (GET request) (views\shop\product-detail.ejs)
-  const prodId = req.params.productId; // get the product id from the url (params)
-  //console.log(prodId); // print the product id to the console
-  // Product.findAll({ where: { id: prodId } })
-  //   .then((products)=>{
-  //     res.render("shop/product-detail", {
-  //       // render the product detail page (views\shop\product-detail.ejs)
-  //       product: products[0], // pass the product to the product detail page (views\shop\product-detail.ejs)
-  //       pageTitle: products[0].title, // pass the page title to the product detail page (views\shop\product-detail.ejs)
-  //       path: "/products", // pass the path to the product detail page (views\shop\product-detail.ejs)
-  //     });
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   });
+  const prodId = req.params.productId;
   Product.findById(prodId)
     .then((product) => {
       res.render("shop/product-detail", {
-        // render the product detail page (views\shop\product-detail.ejs)
-        product: product, // pass the product to the product detail page (views\shop\product-detail.ejs)
-        pageTitle: product.title, // pass the page title to the product detail page (views\shop\product-detail.ejs)
-        path: "/products", // pass the path to the product detail page (views\shop\product-detail.ejs)
-        isAuthenticated: req.session.isLoggedIn,
+        product: product,
+        pageTitle: product.title,
+        path: "/products",
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
-  // find the product by id
-  //console.log(product); // print the product to the console
-  // render the product detail page (views\shop\product-detail.ejs)
-
-  //res.redirect("/"); // redirect to the home page
 };
 
 exports.getIndex = (req, res, next) => {
-  // create a function to get the index page (GET request) (views\shop\index.ejs)
+  const page = +req.query.page || 1;
+  let totalItems;
   Product.find()
+    .countDocuments()
+    .then((numProducts) => {
+      totalItems = numProducts;
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
     .then((products) => {
       res.render("shop/index", {
-        // render the shop page (views\shop\index.ejs)
-        prods: products, // pass the products array to the shop page (views\shop\index.ejs)
-        pageTitle: "Shop", // pass the page title to the shop page (views\shop\index.ejs)
-        path: "/", // pass the path to the shop page (views\shop\index.ejs)
-        isAuthenticated: req.session.isLoggedIn,
-        /*hasProducts: products.length > 0, // pass the hasProducts variable to the shop page
-        activeShop: true, // pass the activeShop variable to the shop page
-        productCSS: true, // pass the productCSS variable to the shop page*/
+        prods: products,
+        pageTitle: "Shop",
+        path: "/",
+        currentPage: page,
+        hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+        hasPreviousPage: page > 1,
+        nextPage: page + 1,
+        previousPage: page - 1,
+        lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
-  // fetch all the products from the products array (views\shop\index.ejs)
 };
 
 exports.getCart = (req, res, next) => {
-  // create a function to get the cart page (GET request) (views\shop\cart.ejs)
-  // Cart.getCart((cart) => {
-  //   // get the cart from the cart model (class) (models\cart.js)
-  //   Product.fetchAll((products) => {
-  //     // fetch all the products from the products array (views\shop\cart.ejs)
-  //     const cartProducts = []; // create an empty array to store the cart products
-  //     for (product of products) {
-  //       // loop through the products array
-  //       const cartProductData = cart.products.find(
-  //         (prod) => prod.id === product.id // find the product in the cart products array (models\cart.js)
-  //       );
-  //       if (cartProductData) {
-  //         // if the product is in the cart products array (models\cart.js)
-  //         cartProducts.push({ productData: product, qty: cartProductData.qty }); // push the product to the cart products array
-  //       }
-  //     }
-  //     res.render("shop/cart", {
-  //       // render the cart page (views\shop\cart.ejs)
-  //       path: "/cart", // pass the path to the cart page
-  //       pageTitle: "Your Cart", // pass the page title to the cart page
-  //       products: cartProducts, // pass the cart products array to the cart page
-  //     });
-  //   });
-  // });
   req.user
     .populate("cart.items.productId")
     .then((user) => {
-      // console.log(user.cart.items);
       const products = user.cart.items;
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",
         products: products,
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postCart = (req, res, next) => {
-  // create a function to   post the cart page (POST request)
-  const prodId = req.body.productId; // get the product id from the request body
+  const prodId = req.body.productId;
   Product.findById(prodId)
     .then((product) => {
       return req.user.addToCart(product);
@@ -135,47 +115,106 @@ exports.postCart = (req, res, next) => {
     .then((result) => {
       console.log(result);
       res.redirect("/cart");
+    })
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
-  // let fetchedCart;
-  // let newQuantity = 1;
-  // req.user
-  //   .getCart()
-  //   .then((cart) => {
-  //     fetchedCart = cart;
-  //     return cart.getProducts({ where: { id: prodId } });
-  //   })
-  //   .then((products) => {
-  //     let product;
-  //     if (products.length > 0) {
-  //       product = products[0];
-  //     }
-  //     if (product) {
-  //       const oldQuantity = product.cartItem.quantity;
-  //       newQuantity = oldQuantity + 1;
-  //       return product;
-  //     }
-  //     return Product.findByPk(prodId);
-  //   })
-  //   .then((product) => {
-  //     return fetchedCart.addProduct(product, {
-  //       through: { quantity: newQuantity },
-  //     });
-  //   })
-  //   .then(() => {
-  //     res.redirect("/cart");
-  //   })
-  //   .catch((err) => console.log(err));
 };
 
 exports.postCartDeleteProduct = (req, res, next) => {
-  // create a function to post the cart delete product page (POST request)
-  const prodId = req.body.productId; // get the product id from the request body
+  const prodId = req.body.productId;
   req.user
     .removeFromCart(prodId)
     .then((result) => {
       res.redirect("/cart");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+};
+
+exports.getCheckout = (req, res, next) => {
+  let products;
+  let total = 0;
+  req.user
+    .populate("cart.items.productId")
+    .then((user) => {
+      products = user.cart.items;
+      total = 0;
+      products.forEach((p) => {
+        total += p.quantity * p.productId.price;
+      });
+
+      return stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        mode: "payment",
+        line_items: products.map((p) => {
+          return {
+            quantity: p.quantity,
+            price_data: {
+              currency: "inr",
+              unit_amount: p.productId.price * 100,
+              product_data: {
+                name: p.productId.title,
+                description: p.productId.description,
+              },
+            },
+          };
+        }),
+        customer_email: req.user.email,
+        success_url:
+          req.protocol + "://" + req.get("host") + "/checkout/success",
+        cancel_url: req.protocol + "://" + req.get("host") + "/checkout/cancel",
+      });
+    })
+    .then((session) => {
+      res.render("shop/checkout", {
+        path: "/checkout",
+        pageTitle: "Checkout",
+        products: products,
+        totalSum: total,
+        sessionId: session.id,
+      });
+    })
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+};
+
+exports.getCheckoutSuccess = (req, res, next) => {
+  req.user
+    .populate("cart.items.productId")
+    .execPopulate()
+    .then((user) => {
+      const products = user.cart.items.map((i) => {
+        return { quantity: i.quantity, product: { ...i.productId._doc } };
+      });
+      const order = new Order({
+        user: {
+          email: req.user.email,
+          userId: req.user,
+        },
+        products: products,
+      });
+      return order.save();
+    })
+    .then((result) => {
+      return req.user.clearCart();
+    })
+    .then(() => {
+      res.redirect("/orders");
+    })
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postOrder = (req, res, next) => {
@@ -187,12 +226,12 @@ exports.postOrder = (req, res, next) => {
       });
       const order = new Order({
         user: {
-          name: req.user.name,
+          email: req.user.email,
           userId: req.user,
         },
         products: products,
-      }); // create a new order
-      return order.save(); // save the order
+      });
+      return order.save();
     })
     .then((result) => {
       return req.user.clearCart();
@@ -200,28 +239,74 @@ exports.postOrder = (req, res, next) => {
     .then(() => {
       res.redirect("/orders");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.getOrders = (req, res, next) => {
-  // create a function to get the orders page (GET request) (views\shop\orders.ejs)
   Order.find({ "user.userId": req.user._id })
     .then((orders) => {
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Your Orders",
         orders: orders,
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
-// exports.getCheckout = (req, res, next) => {
-//   // create a function to get the checkout page (GET request) (views\shop\checkout.ejs)
-//   res.render("shop/checkout", {
-//     // render the checkout page (views\shop\checkout.ejs)
-//     pageTitle: "Checkout", // pass the page title to the checkout page
-//     path: "/checkout", // pass the path to the checkout page
-//   });
-// };
+exports.getInvoice = (req, res, next) => {
+  const orderId = req.params.orderId;
+  Order.findById(orderId)
+    .then((order) => {
+      if (!order) {
+        return next(new Error("No order found."));
+      }
+      if (order.user.userId.toString() !== req.user._id.toString()) {
+        return next(new Error("Unauthorized"));
+      }
+      const invoiceName = "invoice-" + orderId + ".pdf";
+      const invoicePath = path.join("data", "invoices", invoiceName);
+
+      const pdfDoc = new PDFDocument();
+      pdfDoc.pipe(fs.createWriteStream(invoicePath));
+      pdfDoc.pipe(res);
+
+      pdfDoc.fontSize(26).text("Invoice", {
+        underline: true,
+      });
+
+      pdfDoc.text("--------------------------------------------------");
+
+      let totalPrice = 0;
+      order.products.forEach((prod) => {
+        totalPrice += prod.quantity * prod.product.price;
+        pdfDoc
+          .fontSize(14)
+          .text(
+            prod.product.title +
+              " - " +
+              prod.quantity +
+              " x " +
+              "$" +
+              prod.product.price
+          );
+      });
+
+      pdfDoc.text("--------------------------------------------------");
+
+      pdfDoc.fontSize(20).text("Total Price: $" + totalPrice);
+
+      pdfDoc.end();
+    })
+    .catch((err) => {
+      next(err);
+    });
+};

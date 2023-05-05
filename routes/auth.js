@@ -1,13 +1,12 @@
-const express = require("express"); // import the express module
-const { check, body } = require("express-validator"); // import the express-validator module
+const express = require("express");
+const { check, body } = require("express-validator");
 
-const authController = require("../controllers/auth"); // import the auth controller (it'll be used to handle the requests)
-const User = require("../models/user"); // import the user model
+const authController = require("../controllers/auth");
+const User = require("../models/user");
 
-const router = express.Router(); // create a router object to handle the routes (GET and POST requests)
+const router = express.Router();
 
-router.get("/login", authController.getLogin); // get the login page
-
+router.get("/login", authController.getLogin);
 router.get("/signup", authController.getSignup);
 
 router.post(
@@ -23,7 +22,7 @@ router.post(
       .trim(),
   ],
   authController.postLogin
-); // get the signup page
+);
 
 router.post(
   "/signup",
@@ -32,10 +31,6 @@ router.post(
       .isEmail()
       .withMessage("Please enter a valid email.")
       .custom((value, { req }) => {
-        // if (value === "test@test.com") {
-        //   throw new Error("This email address is forbidden.");
-        // }
-        // return true;
         return User.findOne({
           email: value,
         }).then((userDoc) => {
@@ -66,7 +61,7 @@ router.post(
   authController.postSignup
 );
 
-router.post("/logout", authController.postLogout); // get the signup page
+router.post("/logout", authController.postLogout);
 
 router.get("/reset", authController.getReset);
 
@@ -76,4 +71,4 @@ router.get("/reset/:token", authController.getNewPassword);
 
 router.post("/new-password", authController.postNewPassword);
 
-module.exports = router; // export the router object
+module.exports = router;

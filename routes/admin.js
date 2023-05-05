@@ -1,23 +1,18 @@
-const express = require("express"); // import the express module
-//const path = require("path"); // import the path module
-const bodyParser = require("body-parser"); // import the body-parser module to parse the request body (req.body)
-const { body } = require("express-validator"); // import the express-validator module to validate the request body (req.body)
+const express = require("express");
+const bodyParser = require("body-parser");
+const { body } = require("express-validator");
 
-//const rootDir = require("../util/path"); // import the path module to get the root directory path (util/path.js)
-const adminController = require("../controllers/admin"); // import the adminController module (controllers/admin.js)
-const isAuth = require("../middleware/is-auth"); // import the isAuth middleware (middleware/is-auth.js)
+const adminController = require("../controllers/admin");
+const isAuth = require("../middleware/is-auth");
 
-const router = express.Router(); // create a router object to handle the routes (GET and POST requests)
+const router = express.Router();
 
-router.use(bodyParser.urlencoded({ extended: false })); // use the body-parser module to parse the request body
+router.use(bodyParser.urlencoded({ extended: false }));
 
-//itll be fired when the user visits /admin/add-product (GET request)
-router.get("/add-product", isAuth, adminController.getAddProduct); // get the add-product page
+router.get("/add-product", isAuth, adminController.getAddProduct);
 
-//it'll be fired when /admin/products (GET request)
-router.get("/products", isAuth, adminController.getProducts); // get the products page
+router.get("/products", isAuth, adminController.getProducts);
 
-//it'll be fired when the form is submitted (POST request)
 router.post(
   "/add-product",
   [
@@ -32,12 +27,10 @@ router.post(
   ],
   isAuth,
   adminController.postAddProduct
-); // post the add-product page
+);
 
-//it'll be fired when the user visits /admin/edit-product (GET request)
-router.get("/edit-product/:productId", isAuth, adminController.getEditProduct); // get the edit-product page
+router.get("/edit-product/:productId", isAuth, adminController.getEditProduct);
 
-//it'll be fired when the form is submitted (POST request)
 router.post(
   "/edit-product",
   [
@@ -52,11 +45,8 @@ router.post(
   ],
   isAuth,
   adminController.postEditProduct
-); // post the edit-product page
+);
 
-//it'll be fired when the user visits /admin/delete-product (POST request)
-router.delete("/product/:productId", isAuth, adminController.deleteProduct); // delete the product
+router.delete("/product/:productId", isAuth, adminController.deleteProduct);
 
-// exports.routes = router; // export the router object
-// exports.products = products; // export the products array
-module.exports = router; // export the router object
+module.exports = router;

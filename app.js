@@ -8,6 +8,8 @@ const csrf = require("csurf");
 const flash = require("connect-flash");
 const dotenv = require("dotenv").config();
 const multer = require("multer");
+const helmet = require("helmet");
+const compression = require("compression");
 
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
@@ -16,6 +18,9 @@ const errorController = require("./controllers/error");
 const User = require("./models/user");
 
 const app = express();
+
+app.use(helmet());
+app.use(compression());
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -113,7 +118,7 @@ mongoose
   .connect(process.env.MONGODB_URI)
   .then((result) => {
     console.log("Connected! Khush ho jao!");
-    app.listen(5000);
+    app.listen(process.env.PORT || 5000);
   })
   .catch((err) => {
     console.log(err);

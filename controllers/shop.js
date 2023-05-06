@@ -246,6 +246,11 @@ exports.getInvoice = (req, res, next) => {
       const invoicePath = path.join("data", "invoices", invoiceName);
 
       const pdfDoc = new PDFDocument();
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        'inline; filename="' + invoiceName + '"'
+      );
       pdfDoc.pipe(fs.createWriteStream(invoicePath));
       pdfDoc.pipe(res);
 
@@ -265,14 +270,14 @@ exports.getInvoice = (req, res, next) => {
               " - " +
               prod.quantity +
               " x " +
-              "₹" +
+              " Rs " +
               prod.product.price
           );
       });
 
       pdfDoc.text("--------------------------------------------------");
 
-      pdfDoc.fontSize(20).text("Total Price: $" + totalPrice);
+      pdfDoc.fontSize(20).text("Total Price: Rs " + totalPrice);
 
       pdfDoc.end();
     })

@@ -19,9 +19,6 @@ const User = require("./models/user");
 
 const app = express();
 
-app.use(helmet());
-app.use(compression());
-
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "images");

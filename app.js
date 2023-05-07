@@ -8,8 +8,6 @@ const csrf = require("csurf");
 const flash = require("connect-flash");
 const dotenv = require("dotenv").config();
 const multer = require("multer");
-const helmet = require("helmet");
-const compression = require("compression");
 
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
